@@ -6,7 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
-    Copyright (C) 2017 OpenCFD Ltd.
+    Copyright (C) 2017-2019,2022 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
     #define CREATE_MESH createMeshesPostProcess.H
     #include "postProcess.H"
 
+    #include "addCheckCaseOptions.H"
     #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createMeshes.H"
@@ -80,6 +81,8 @@ int main(int argc, char *argv[])
     #include "compressibleMultiRegionCourantNo.H"
     #include "solidRegionDiffusionNo.H"
     #include "setInitialMultiRegionDeltaT.H"
+
+    #include "createCoupledRegions.H"
 
     while (runTime.run())
     {
@@ -110,20 +113,62 @@ int main(int argc, char *argv[])
 
             forAll(fluidRegions, i)
             {
-                Info<< "\nSolving for fluid region "
-                    << fluidRegions[i].name() << endl;
-                #include "setRegionFluidFields.H"
+                fvMesh& mesh = fluidRegions[i];
+
                 #include "readFluidMultiRegionPIMPLEControls.H"
+                #include "setRegionFluidFields.H"
                 #include "solveFluid.H"
             }
 
             forAll(solidRegions, i)
             {
-                Info<< "\nSolving for solid region "
-                    << solidRegions[i].name() << endl;
-                #include "setRegionSolidFields.H"
+                fvMesh& mesh = solidRegions[i];
+
                 #include "readSolidMultiRegionPIMPLEControls.H"
+                #include "setRegionSolidFields.H"
                 #include "solveSolid.H"
+            }
+
+            if (coupled)
+            {
+                Info<< "\nSolving energy coupled regions " << endl;
+                fvMatrixAssemblyPtr->solve();
+                #include "correctThermos.H"
+
+                forAll(fluidRegions, i)
+                {
+                    fvMesh& mesh = fluidRegions[i];
+
+                    #include "readFluidMultiRegionPIMPLEControls.H"
+                    #include "setRegionFluidFields.H"
+                    if (!frozenFlow)
+                    {
+                        Info<< "\nSolving for fluid region "
+                            << fluidRegions[i].name() << endl;
+			
+			#include "UrelEqn.H"
+			
+			// --- PISO loop
+                        for (int corr=0; corr<nCorr; corr++)
+                        {
+                            #include "pEqn.H"
+                        }
+
+			//Update pEqn corrected absolute velocity for
+    			//calculating U and Urad
+    			U = Urel + SRF.U();
+    			Urad = (U.component(2)*cos(phiAngle)+(U.component(1)*sin(phiAngle)));
+    			Utan = (U.component(2)*sin(phiAngle)-(U.component(1)*cos(phiAngle)));
+
+                        turbulence.correct();
+                    }
+
+                    rho = thermo.rho();
+                    Info<< "Min/max T:" << min(thermo.T()).value() << ' '
+                        << max(thermo.T()).value() << endl;
+                }
+
+                fvMatrixAssemblyPtr->clear();
             }
 
             // Additional loops for energy solution only
@@ -137,21 +182,40 @@ int main(int argc, char *argv[])
 
                     forAll(fluidRegions, i)
                     {
+                        fvMesh& mesh = fluidRegions[i];
+
                         Info<< "\nSolving for fluid region "
                             << fluidRegions[i].name() << endl;
-                       #include "setRegionFluidFields.H"
-                       #include "readFluidMultiRegionPIMPLEControls.H"
-                       frozenFlow = true;
-                       #include "solveFluid.H"
+                        #include "readFluidMultiRegionPIMPLEControls.H"
+                        #include "setRegionFluidFields.H"
+                        frozenFlow = true;
+                        #include "solveFluid.H"
                     }
 
                     forAll(solidRegions, i)
                     {
+                        fvMesh& mesh = solidRegions[i];
+
                         Info<< "\nSolving for solid region "
                             << solidRegions[i].name() << endl;
-                        #include "setRegionSolidFields.H"
                         #include "readSolidMultiRegionPIMPLEControls.H"
+                        #include "setRegionSolidFields.H"
                         #include "solveSolid.H"
+                    }
+
+                    if (coupled)
+                    {
+                        Info<< "\nSolving energy coupled regions " << endl;
+                        fvMatrixAssemblyPtr->solve();
+                        #include "correctThermos.H"
+
+                        forAll(fluidRegions, i)
+                        {
+                            #include "setRegionFluidFields.H"
+                            rho = thermo.rho();
+                        }
+
+                        fvMatrixAssemblyPtr->clear();
                     }
                 }
             }

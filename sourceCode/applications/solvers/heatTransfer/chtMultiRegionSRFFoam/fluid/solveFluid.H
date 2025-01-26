@@ -1,6 +1,6 @@
 if (finalIter)
 {
-    mesh.data::add("finalIteration", true);
+    mesh.data().setFinalIteration(true);
 }
 
 if (frozenFlow)
@@ -16,7 +16,7 @@ else
 
     #include "UrelEqn.H"
 
-    //Update absolute velcoity for calculating Urad
+    //Update absolute velocity for calculating Urad
     U = Urel + SRF.U();
     //Update Urad for EEqn.H
     Urad = (U.component(2)*cos(phiAngle)+(U.component(1)*sin(phiAngle)));
@@ -24,24 +24,29 @@ else
     #include "YEqn.H"
     #include "EEqn.H"
 
-    // --- PISO loop
-    for (int corr=0; corr<nCorr; corr++)
+    if (!coupled)
     {
-        #include "pEqn.H"
+        Info<< "\nSolving for fluid region " << fluidRegions[i].name() << endl;
+
+        // --- PISO loop
+        for (int corr=0; corr<nCorr; corr++)
+        {
+            #include "pEqn.H"
+        }
+    
+	//Update pEqn corrected absolute velocity for 
+    	//calculating U and Urad
+    	U = Urel + SRF.U();
+    	Urad = (U.component(2)*cos(phiAngle)+(U.component(1)*sin(phiAngle)));
+    	Utan = (U.component(2)*sin(phiAngle)-(U.component(1)*cos(phiAngle)));
+
+    	turbulence.correct();
+
+    	rho = thermo.rho();
     }
-
-    //Update pEqn corrected absolute velocity for 
-    //calculating U and Urad
-    U = Urel + SRF.U();
-    Urad = (U.component(2)*cos(phiAngle)+(U.component(1)*sin(phiAngle)));
-    Utan = (U.component(2)*sin(phiAngle)-(U.component(1)*cos(phiAngle)));
-
-    turbulence.correct();
-
-    rho = thermo.rho();
 }
 
 if (finalIter)
 {
-    mesh.data::remove("finalIteration");
+    mesh.data().setFinalIteration(false);
 }

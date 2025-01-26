@@ -1,0 +1,6 @@
+SOURCE = \
+turbulentTemperatureCoupledBaffleMixedMixingPlaneFvPatchScalarField.C \
+mixingPlane.cpp \
+$(BCs)/temperatureCoupledBase/temperatureCoupledBase.C \
+
+# sources

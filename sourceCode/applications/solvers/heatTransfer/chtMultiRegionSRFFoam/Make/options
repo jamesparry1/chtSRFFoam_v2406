@@ -18,7 +18,9 @@ EXE_INC = \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
-    -I$(LIB_SRC)/regionModels/regionModel/lnInclude
+    -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
+    -I$(LIB_SRC)/regionFaModels/lnInclude
+
 
 EXE_LIBS = \
     -lfiniteVolume \
@@ -35,6 +37,9 @@ EXE_LIBS = \
     -lcombustionModels \
     -lturbulenceModels \
     -lcompressibleTurbulenceModels \
+    -lthermoTools \
     -lradiationModels \
     -lregionModels \
+    -lregionFaModels \
+    -lfiniteArea \
     -L$(FOAM_MODULE_LIBBIN) -lturbulentTemperatureCoupledBaffleMixedMixingPlane

@@ -17,7 +17,6 @@
         )
       - fvm::laplacian(turbulence->alphaEff(), he)
      ==
-        //rho*(U&g)
 	rho*r()*magSqr(SRF->omega())*Urad()
       + radiation->Sh(thermo, he)
       + fvOptions(rho, he)

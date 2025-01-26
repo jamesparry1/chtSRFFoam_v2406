@@ -1,0 +1,8 @@
+turbulentTemperatureCoupledBaffleMixedMixingPlaneFvPatchScalarField.C
+mixingPlane.cpp
+
+BCs = ${FOAM_SRC}/thermoTools/derivedFvPatchFields
+
+$(BCs)/temperatureCoupledBase/temperatureCoupledBase.C
+
+LIB = $(FOAM_USER_LIBBIN)/libturbulentTemperatureCoupledBaffleMixedMixingPlane

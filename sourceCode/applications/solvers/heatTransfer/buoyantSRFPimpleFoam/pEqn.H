@@ -24,8 +24,6 @@ surfaceScalarField phiHbyA
   + phig
 );
 
-//fvOptions.makeRelative(fvc::interpolate(rho), phiHbyA);
-
 // Update the pressure BCs to ensure flux consistency
 constrainPressure(p_rgh, rho, Urel, phiHbyA, rhorAUrelf);
 
@@ -107,8 +105,16 @@ else
 
 rho = thermo.rho();
 
-// Update pressure time derivative if needed
+// Correct rhoUf if the mesh is moving
+fvc::correctRhoUf(rhoUf, rho, U, phi);
+
 if (thermo.dpdt())
 {
     dpdt = fvc::ddt(p);
+
+    if (mesh.moving())
+    {
+        dpdt -= fvc::div(fvc::meshPhi(rho, U), p);
+    }
 }
+

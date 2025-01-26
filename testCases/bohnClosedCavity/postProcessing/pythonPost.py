@@ -10,14 +10,14 @@ latestTime = max(folderPath, key=os.path.getctime)
 latestTime = os.path.basename(latestTime)
 
 # -------------- Load Data --------------------#
-T0 = np.loadtxt(os.path.join('cav_probes_line1/',latestTime,'line_T_p.xy'));
-T45 = np.loadtxt(os.path.join('cav_probes_line2/',latestTime,'line_T_p.xy'));
-T90 = np.loadtxt(os.path.join('cav_probes_line3/',latestTime,'line_T_p.xy'));
-T135 = np.loadtxt(os.path.join('cav_probes_line4/',latestTime,'line_T_p.xy'));
-T180 = np.loadtxt(os.path.join('cav_probes_line5/',latestTime,'line_T_p.xy'));
-T225 = np.loadtxt(os.path.join('cav_probes_line6/',latestTime,'line_T_p.xy'));
-T270 = np.loadtxt(os.path.join('cav_probes_line7/',latestTime,'line_T_p.xy'));
-T315 = np.loadtxt(os.path.join('cav_probes_line8/',latestTime,'line_T_p.xy'));
+T0 = np.loadtxt(os.path.join('cav_probes_line1/',latestTime,'line_T_p_U_Urel.xy'));
+T45 = np.loadtxt(os.path.join('cav_probes_line2/',latestTime,'line_T_p_U_Urel.xy'));
+T90 = np.loadtxt(os.path.join('cav_probes_line3/',latestTime,'line_T_p_U_Urel.xy'));
+T135 = np.loadtxt(os.path.join('cav_probes_line4/',latestTime,'line_T_p_U_Urel.xy'));
+T180 = np.loadtxt(os.path.join('cav_probes_line5/',latestTime,'line_T_p_U_Urel.xy'));
+T225 = np.loadtxt(os.path.join('cav_probes_line6/',latestTime,'line_T_p_U_Urel.xy'));
+T270 = np.loadtxt(os.path.join('cav_probes_line7/',latestTime,'line_T_p_U_Urel.xy'));
+T315 = np.loadtxt(os.path.join('cav_probes_line8/',latestTime,'line_T_p_U_Urel.xy'));
 pTime = np.loadtxt('probes_cav0deg/0/p');
 
 #dataFullT = [T0[:,1],T45[:,1],T90[:,1],T135[:,1],T180[:,1],T225[:,1],T270[:,1],T315[:,1]]

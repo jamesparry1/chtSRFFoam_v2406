@@ -35,7 +35,7 @@
                 (
                     solidRegions[i],
                     thermos[i],
-                    coordinateSystem::typeName_()
+                    coordinateSystem::typeName
                 )
             );
 
@@ -57,7 +57,7 @@
                     ),
                     solidRegions[i],
                     dimensionedSymmTensor(tkappaByCp().dimensions(), Zero),
-                    zeroGradientFvPatchSymmTensorField::typeName
+                    fvPatchFieldBase::zeroGradientType()
                 )
             );
 

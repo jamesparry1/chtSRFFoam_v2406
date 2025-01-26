@@ -1,0 +1,2 @@
+BCs = ${FOAM_SRC}/thermoTools/derivedFvPatchFields
+LIB = $(FOAM_USER_LIBBIN)/libturbulentTemperatureCoupledBaffleMixedMixingPlane
